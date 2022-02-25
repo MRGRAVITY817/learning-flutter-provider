@@ -61,17 +61,28 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: const Text('Provider 06'),
         ),
-        body: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("- name: ${context.watch<Dog>().name}",
-                style: const TextStyle(fontSize: 20.0)),
-            const SizedBox(height: 10.0),
-            const BreedAndAge()
-          ],
-        )));
+        body: Consumer<Dog>(
+            builder: (BuildContext context, Dog dog, Widget? child) {
+              return Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // `!` should be written behind `child` because it can be null
+                  child!,
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  Text("- name: ${dog.name}",
+                      style: const TextStyle(fontSize: 20.0)),
+                  const SizedBox(height: 10.0),
+                  const BreedAndAge()
+                ],
+              ));
+            },
+            // Since this don't need to be rerendered by context change, it should be in `child` props
+            child: const Text("I like dogs very much",
+                style: TextStyle(fontSize: 20.0))));
   }
 }
 
@@ -80,13 +91,17 @@ class BreedAndAge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text('- breed: ${context.select<Dog, String>((dog) => dog.breed)}',
-            style: const TextStyle(fontSize: 20.0)),
-        const SizedBox(height: 10.0),
-        const Age(),
-      ],
+    return Consumer<Dog>(
+      builder: (_, Dog dog, __) {
+        return Column(
+          children: [
+            Text('- breed: ${dog.breed}',
+                style: const TextStyle(fontSize: 20.0)),
+            const SizedBox(height: 10.0),
+            const Age(),
+          ],
+        );
+      },
     );
   }
 }
@@ -98,27 +113,30 @@ class Age extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text('- age: ${context.select<Dog, int>((dog) => dog.age)}',
-            style: const TextStyle(fontSize: 20.0)),
-        const SizedBox(
-          height: 10.0,
-        ),
-        Text('- number of babies: ${context.read<int>()}',
-            style: const TextStyle(fontSize: 20.0)),
-        const SizedBox(
-          height: 10.0,
-        ),
-        Text('- number of barks: ${context.watch<String>()}',
-            style: const TextStyle(fontSize: 20.0)),
-        const SizedBox(
-          height: 20.0,
-        ),
-        ElevatedButton(
-            onPressed: () => context.read<Dog>().grow(),
-            child: const Text('Grow', style: TextStyle(fontSize: 20.0)))
-      ],
+    return Consumer<Dog>(
+      builder: (_, Dog dog, __) {
+        return Column(
+          children: [
+            Text('- age: ${dog.age}', style: const TextStyle(fontSize: 20.0)),
+            const SizedBox(
+              height: 10.0,
+            ),
+            Text('- number of babies: ${context.read<int>()}',
+                style: const TextStyle(fontSize: 20.0)),
+            const SizedBox(
+              height: 10.0,
+            ),
+            Text('- number of barks: ${context.watch<String>()}',
+                style: const TextStyle(fontSize: 20.0)),
+            const SizedBox(
+              height: 20.0,
+            ),
+            ElevatedButton(
+                onPressed: () => dog.grow(),
+                child: const Text('Grow', style: TextStyle(fontSize: 20.0)))
+          ],
+        );
+      },
     );
   }
 }
