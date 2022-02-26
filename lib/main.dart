@@ -61,8 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: const Text('Provider 06'),
         ),
-        body: Consumer<Dog>(
-            builder: (BuildContext context, Dog dog, Widget? child) {
+        body: Selector<Dog, String>(
+            selector: (BuildContext context, Dog dog) => dog.name,
+            builder: (BuildContext context, String name, Widget? child) {
               return Center(
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -73,8 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   const SizedBox(
                     height: 10.0,
                   ),
-                  Text("- name: ${dog.name}",
-                      style: const TextStyle(fontSize: 20.0)),
+                  Text("- name: $name", style: const TextStyle(fontSize: 20.0)),
                   const SizedBox(height: 10.0),
                   const BreedAndAge()
                 ],
@@ -91,12 +91,12 @@ class BreedAndAge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Dog>(
-      builder: (_, Dog dog, __) {
+    return Selector<Dog, String>(
+      selector: (BuildContext context, Dog dog) => dog.breed,
+      builder: (_, String breed, __) {
         return Column(
           children: [
-            Text('- breed: ${dog.breed}',
-                style: const TextStyle(fontSize: 20.0)),
+            Text('- breed: $breed', style: const TextStyle(fontSize: 20.0)),
             const SizedBox(height: 10.0),
             const Age(),
           ],
@@ -113,11 +113,12 @@ class Age extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Dog>(
-      builder: (_, Dog dog, __) {
+    return Selector<Dog, int>(
+      selector: (BuildContext context, Dog dog) => dog.age,
+      builder: (_, int age, __) {
         return Column(
           children: [
-            Text('- age: ${dog.age}', style: const TextStyle(fontSize: 20.0)),
+            Text('- age: $age', style: const TextStyle(fontSize: 20.0)),
             const SizedBox(
               height: 10.0,
             ),
@@ -132,7 +133,7 @@ class Age extends StatelessWidget {
               height: 20.0,
             ),
             ElevatedButton(
-                onPressed: () => dog.grow(),
+                onPressed: () => context.read<Dog>().grow(),
                 child: const Text('Grow', style: TextStyle(fontSize: 20.0)))
           ],
         );
